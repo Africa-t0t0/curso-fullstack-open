@@ -4,25 +4,23 @@ const User = require('../models/user');
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
-    console.log(':D', blogs)
     response.json(blogs);
 });
 
 blogsRouter.post('/', async (request, response) => {
     const body = request.body;
-
     const decodedToken = request.user;
-    if (!decodedToken || !decodedToken.id) {
+    if (!decodedToken) {
         return response.status(401).json({ error: 'token missing or invalid' });
     }
-
     const user = await User.findById(decodedToken.id);
+
     if (!user) {
         return response.status(400).json({ error: 'user not found' });
     }
-
-    if (!body.url || !body.title || !body.likes) {
-        return response.status(400).json({ error: 'url or title or likes is missing' });
+    console.log(body);
+    if (!body.url || !body.title || !body.author) {
+        return response.status(400).json({ error: 'url or title or author is missing' });
     }
 
     const blog = new Blog({

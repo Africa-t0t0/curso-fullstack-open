@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import Feedback from './components/Feedback'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -12,7 +13,9 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
-  console.log(blogs)
+
+  const [notification, setNotification] = useState({ message: null, status: null })
+
   useEffect(() => {
     if (user) {
       blogService.getAll().then(blogs =>
@@ -42,9 +45,13 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotification({ message: 'welcome back ' + user.username, status: 'success' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
 
     } catch (error) {
       console.log(error)
+      setNotification({ message: error.response.data.error, status: 'error' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
 
     }
   }
@@ -56,17 +63,25 @@ const App = () => {
   }
 
   const handleBlogSubmit = async (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: title,
-      author: author,
-      url: url,
+    try {
+      event.preventDefault()
+      const blogObject = {
+        title: title,
+        author: author,
+        url: url,
+      }
+      const newBlog = await blogService.create(blogObject)
+      setNotification({ message: 'a new blog ' + blogObject.title + ' by ' + blogObject.author + ' added', status: 'success' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
+      setBlogs(blogs.concat(newBlog))
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+    } catch (error) {
+      console.log(error)
+      setNotification({ message: error.response.data.error, status: 'error' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
     }
-    const newBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(newBlog))
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
   const loginForm = (
@@ -128,8 +143,8 @@ const App = () => {
 
   return (
     <div>
-
       {user === null ? loginForm : blogForm}
+      <Feedback message={notification.message} status={notification.status} />
       {user !== null && (
         <div>
           <p>{user.username} logged in</p>
