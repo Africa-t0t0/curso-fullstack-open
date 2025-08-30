@@ -7,15 +7,18 @@ import Notification from './components/Notification'
 import CountriesViewer from './components/CountriesViewer'
 
 import { useEffect, useState } from 'react'
+import './index.css'
 
 import methods from './services/methods'
-a
+import loginService from './services/login'
 
 const App = () => {
   const [persons, setPersons] = useState(null);
   const [message, setMessage] = useState(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [user, setUser] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     methods.getAll().then(response => {
@@ -24,10 +27,58 @@ const App = () => {
 
   }, []);
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    console.log('logging in with', username, password);
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedPhonebookUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      methods.setToken(user.token)
+    }
+  }, []);
+
+  const handleLogin = async (event) => {
+    event.preventDefault()
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+      window.localStorage.setItem('loggedPhonebookUser', JSON.stringify(user))
+      methods.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
   };
+
+
+  const loginForm = (
+    <form onSubmit={handleLogin}>
+      <div>
+        username
+        <input
+          type="text"
+          value={username}
+          name="Username"
+          onChange={({ target }) => setUsername(target.value)}
+        />
+      </div>
+      <div>
+        password
+        <input
+          type="password"
+          value={password}
+          name="Password"
+          onChange={({ target }) => setPassword(target.value)}
+        />
+      </div>
+      <button type="submit">login</button>
+    </form>
+  );
 
   const [newContact, setNewContact] = useState({
     name: "",
@@ -59,7 +110,7 @@ const App = () => {
       const targetId = persons.filter(person => person.name === newContact.name)[0].id
       if (confirmUpdate) {
         const id = targetId
-        const promise = methods.update(id, {name: newContact.name, number: newContact.number})
+        const promise = methods.update(id, { name: newContact.name, number: newContact.number })
         // handle error in case user its already deleted
         promise.catch(error => {
           console.log("error", error)
@@ -68,14 +119,14 @@ const App = () => {
           handleNotification(message);
           return
         })
-        setPersons(persons.map(person => person.id !== id ? person : {name: newContact.name, number: newContact.number}))
+        setPersons(persons.map(person => person.id !== id ? person : { name: newContact.name, number: newContact.number }))
         const message = `Updated ${newContact.name}`
         handleNotification(message)
         return
       }
     }
 
-    methods.create({name: newContact.name, number: newContact.number})
+    methods.create({ name: newContact.name, number: newContact.number })
       .then(response => {
         setPersons(persons.concat(response));
         const message = `Added ${newContact.name}`
@@ -85,7 +136,7 @@ const App = () => {
         let errorMessage = `failed to create user: ${error.response.data.error}`;
         handleNotification(errorMessage);
       })
-      return
+    return
   }
 
   const removeContact = (event) => {
@@ -127,29 +178,24 @@ const App = () => {
     )
   }
 
+  const personForm = (
+    <>
+      <h2>Add a new</h2>
+      <PersonForm
+        addContact={addContact}
+        newContact={newContact}
+        newNameOnChange={newNameOnChange}
+        setNewNumberOnChange={setNewNumberOnChange}
+      />
+    </>
+  );
+
   return (
     <div>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-            <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
+      {user === null ? loginForm : <div>
+        <p>{user.name} logged-in</p>
+        {personForm}
+      </div>}
 
       <h2>Phonebook</h2>
       <Filter
@@ -157,15 +203,10 @@ const App = () => {
         searchTerm={searchTerm}
         handleSearchTermChange={handleSearchTermChange}
       />
-      <Notification message={message} />
-      <h2>Add a new</h2>
+      <Notification message={errorMessage} type="error" />
+      <Notification message={message} type="success" />
 
-      <PersonForm
-        addContact={addContact}
-        newContact={newContact}
-        newNameOnChange={newNameOnChange}
-        setNewNumberOnChange={setNewNumberOnChange}
-      />
+
       <h2>Numbers</h2>
 
       <Persons
