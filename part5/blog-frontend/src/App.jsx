@@ -3,6 +3,8 @@ import Blog from './components/Blog'
 import Feedback from './components/Feedback'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
 
 
 const App = () => {
@@ -13,6 +15,7 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [loginVisible, setLoginVisible] = useState(false);
 
   const [notification, setNotification] = useState({ message: null, status: null })
 
@@ -32,6 +35,18 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value)
+  }
+
+  const handleAuthorChange = (event) => {
+    setAuthor(event.target.value)
+  }
+
+  const handleUrlChange = (event) => {
+    setUrl(event.target.value)
+  }
 
 
   const handleLogin = async (event) => {
@@ -84,66 +99,44 @@ const App = () => {
     }
   }
 
-  const loginForm = (
-    <form onSubmit={handleLogin}>
+  const loginForm = () => {
+    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
+    const showWhenVisible = { display: loginVisible ? '' : 'none' }
+
+    return (
       <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
+        <div style={hideWhenVisible}>
+          <button onClick={() => setLoginVisible(true)}>login</button>
+        </div>
+        <div style={showWhenVisible}>
+          <LoginForm
+            handleSubmit={handleLogin}
+            handleUsernameChange={({ target }) => setUsername(target.value)}
+            handlePasswordChange={({ target }) => setPassword(target.value)}
+            username={username}
+            password={password}
+          />
+          <button onClick={() => setLoginVisible(false)}>cancel</button>
+        </div>
       </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
+    );
+  }
 
   const blogForm = (
-    <form onSubmit={handleBlogSubmit}>
-      <div>
-        title
-        <input
-          type="text"
-          value={title}
-          name="Title"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author
-        <input
-          type="text"
-          value={author}
-          name="Author"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url
-        <input
-          type="text"
-          value={url}
-          name="Url"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>
+    <BlogForm
+      handleSubmit={handleBlogSubmit}
+      handleTitleChange={handleTitleChange}
+      handleAuthorChange={handleAuthorChange}
+      handleUrlChange={handleUrlChange}
+      title={title}
+      author={author}
+      url={url}
+    />
   )
 
   return (
     <div>
-      {user === null ? loginForm : blogForm}
+      {user === null ? loginForm() : blogForm}
       <Feedback message={notification.message} status={notification.status} />
       {user !== null && (
         <div>
