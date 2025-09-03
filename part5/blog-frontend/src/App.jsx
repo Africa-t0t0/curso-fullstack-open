@@ -5,6 +5,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import BlogForm from './components/BlogForm'
 import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 
 
 const App = () => {
@@ -100,38 +101,32 @@ const App = () => {
   }
 
   const loginForm = () => {
-    const hideWhenVisible = { display: loginVisible ? 'none' : '' }
-    const showWhenVisible = { display: loginVisible ? '' : 'none' }
 
     return (
-      <div>
-        <div style={hideWhenVisible}>
-          <button onClick={() => setLoginVisible(true)}>login</button>
-        </div>
-        <div style={showWhenVisible}>
-          <LoginForm
-            handleSubmit={handleLogin}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-            username={username}
-            password={password}
-          />
-          <button onClick={() => setLoginVisible(false)}>cancel</button>
-        </div>
-      </div>
+      <Togglable buttonLabel="login">
+        <LoginForm
+          handleSubmit={handleLogin}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          username={username}
+          password={password}
+        />
+      </Togglable>
     );
   }
 
   const blogForm = (
-    <BlogForm
-      handleSubmit={handleBlogSubmit}
-      handleTitleChange={handleTitleChange}
-      handleAuthorChange={handleAuthorChange}
-      handleUrlChange={handleUrlChange}
-      title={title}
-      author={author}
-      url={url}
-    />
+    <Togglable buttonLabel="new blog">
+      <BlogForm
+        handleSubmit={handleBlogSubmit}
+        handleTitleChange={handleTitleChange}
+        handleAuthorChange={handleAuthorChange}
+        handleUrlChange={handleUrlChange}
+        title={title}
+        author={author}
+        url={url}
+      />
+    </Togglable>
   )
 
   return (
