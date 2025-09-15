@@ -3,7 +3,7 @@ const Blog = require('../models/models');
 const User = require('../models/user');
 
 blogsRouter.get('/', async (request, response) => {
-    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
+        const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 }).populate('likedBy', { username: 1 });
     response.json(blogs);
 });
 
@@ -58,10 +58,14 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
     const blog = await Blog.findById(request.params.id);
+    console.log("request", request.body);
     if (!blog) {
         return response.status(404).json({ error: 'blog not found' });
     }
     blog.likes = request.body.likes;
+    const likedBy = await User.findOne({ username: request.body.likedBy });
+    blog.likedBy.push(likedBy.id);
+    console.log(blog);
     await blog.save();
     response.json(blog);
 });

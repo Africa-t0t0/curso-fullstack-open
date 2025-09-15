@@ -16,14 +16,16 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
-  const [loginVisible, setLoginVisible] = useState(false);
 
   const [notification, setNotification] = useState({ message: null, status: null })
 
   useEffect(() => {
     if (user) {
-      blogService.getAll().then(blogs =>
+      blogService.getAll().then(blogs => (
+        console.log(blogs),
+        blogs.sort((a, b) => b.likes - a.likes),
         setBlogs(blogs)
+      )
       )
     }
   }, [user])
@@ -100,6 +102,21 @@ const App = () => {
     }
   }
 
+  const handleLike = async (blog) => {
+    if (blog.likedBy.includes(user.username)) {
+      alert('You have already liked this blog')
+      return
+    }
+    const likedBlog = { ...blog, likes: blog.likes + 1, likedBy: user.username }
+    await blogService.update(blog.id, likedBlog)
+    setBlogs(blogs.map(blog => blog.id !== likedBlog.id ? blog : likedBlog))
+  }
+
+  const handleRemove = async (blog) => {
+    await blogService.remove(blog.id)
+    setBlogs(blogs.filter(blog => blog.id !== blog.id))
+  }
+
   const loginForm = () => {
 
     return (
@@ -141,7 +158,12 @@ const App = () => {
       )}
       <h2>blogs</h2>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <div key={blog.id}>
+          {blog.title}
+          <Togglable key={blog.id} buttonLabel="view">
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} handleRemove={handleRemove} />
+          </Togglable>
+        </div>
       )}
     </div>
 
