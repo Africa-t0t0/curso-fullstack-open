@@ -13,7 +13,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-
+  console.log('user!!!', user)
   const [notification, setNotification] = useState({ message: null, status: null })
 
   useEffect(() => {
@@ -79,9 +79,11 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
+      console.log('userXX', user)
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
+      console.log('user', user)
       setUsername('')
       setPassword('')
       setNotification({ message: 'welcome back ' + user.username, status: 'success' })
@@ -102,11 +104,17 @@ const App = () => {
   }
 
   const handleLike = async (blog) => {
-    if (blog.likedBy && blog.likedBy.includes(user.username)) {
-      alert('You have already liked this blog')
+    const hasLiked = blog.likedBy && blog.likedBy.some(
+      like => like.user && like.user.id === user.id
+    );
+
+    if (hasLiked) {
+      setNotification({ message: 'You have already liked this blog', status: 'error' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
       return
     }
-    const likedBlog = { ...blog, likes: blog.likes + 1, likedBy: [...blog.likedBy, user.username] }
+    const likedBlog = { ...blog, likes: blog.likes + 1, likedBy: [...blog.likedBy, { id: user.id, username: user.username }] }
+    console.log('likedBlog', likedBlog)
     await blogService.update(blog.id, likedBlog)
     setBlogs(blogs.map(blog => blog.id !== likedBlog.id ? blog : likedBlog))
   }

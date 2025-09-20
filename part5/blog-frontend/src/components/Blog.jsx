@@ -6,14 +6,11 @@ const blogStyle = {
   marginBottom: 5
 }
 
-const user = JSON.parse(window.localStorage.getItem('loggedBlogUser'));
-
 const Blog = ({ blog, handleLike, handleRemove }) => {
   const currentUser = JSON.parse(window.localStorage.getItem('loggedBlogUser'));
 
   return (
     <div style={blogStyle}>
-      {console.log('blog', blog)}
       <ul>
         <li>{blog.title} by {blog.author}</li>
         <li>{blog.url}</li>

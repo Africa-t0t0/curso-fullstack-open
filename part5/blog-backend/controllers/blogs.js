@@ -57,17 +57,22 @@ blogsRouter.delete('/:id', async (request, response) => {
 });
 
 blogsRouter.put('/:id', async (request, response) => {
-    const blog = await Blog.findById(request.params.id);
-    console.log("request", request.body);
-    if (!blog) {
-        return response.status(404).json({ error: 'blog not found' });
+    try {
+        const blog = await Blog.findById(request.params.id);
+        if (!blog) {
+            return response.status(404).json({ error: 'blog no encontrado' });
+        }
+        blog.likes = request.body.likes;
+        if (request.body.likedBy && Array.isArray(request.body.likedBy)) {
+            blog.likedBy = request.body.likedBy.map(user => user.id || user._id);
+        }
+
+        const updatedBlog = await blog.save();
+        response.json(updatedBlog);
+    } catch (error) {
+        console.error('Error al actualizar el blog:', error);
+        response.status(400).json({ error: 'Error al actualizar el blog' });
     }
-    blog.likes = request.body.likes;
-    const likedBy = await User.findOne({ username: request.body.likedBy });
-    blog.likedBy.push(likedBy.id);
-    console.log(blog);
-    await blog.save();
-    response.json(blog);
 });
 
 module.exports = blogsRouter;
