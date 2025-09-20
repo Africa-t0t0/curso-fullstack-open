@@ -13,6 +13,7 @@ const Blog = ({ blog, handleLike, handleRemove }) => {
 
   return (
     <div style={blogStyle}>
+      {console.log('blog', blog)}
       <ul>
         <li>{blog.title} by {blog.author}</li>
         <li>{blog.url}</li>

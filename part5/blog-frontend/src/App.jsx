@@ -13,9 +13,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   const [notification, setNotification] = useState({ message: null, status: null })
 
@@ -76,19 +73,6 @@ const App = () => {
       });
   };
 
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
-  }
-
-
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
@@ -117,34 +101,12 @@ const App = () => {
     setUser(null)
   }
 
-  const handleBlogSubmit = async (event) => {
-    try {
-      event.preventDefault()
-      const blogObject = {
-        title: title,
-        author: author,
-        url: url,
-      }
-      const newBlog = await blogService.create(blogObject)
-      setNotification({ message: 'a new blog ' + blogObject.title + ' by ' + blogObject.author + ' added', status: 'success' })
-      setTimeout(() => setNotification({ message: null, status: null }), 5000)
-      setBlogs(blogs.concat(newBlog))
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    } catch (error) {
-      console.log(error)
-      setNotification({ message: error.response.data.error, status: 'error' })
-      setTimeout(() => setNotification({ message: null, status: null }), 5000)
-    }
-  }
-
   const handleLike = async (blog) => {
-    if (blog.likedBy.includes(user.username)) {
+    if (blog.likedBy && blog.likedBy.includes(user.username)) {
       alert('You have already liked this blog')
       return
     }
-    const likedBlog = { ...blog, likes: blog.likes + 1, likedBy: user.username }
+    const likedBlog = { ...blog, likes: blog.likes + 1, likedBy: [...blog.likedBy, user.username] }
     await blogService.update(blog.id, likedBlog)
     setBlogs(blogs.map(blog => blog.id !== likedBlog.id ? blog : likedBlog))
   }
