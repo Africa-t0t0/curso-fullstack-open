@@ -39,6 +39,43 @@ const App = () => {
     }
   }, [])
 
+  const createBlog = (blogObject) => {
+    blogService
+      .create(blogObject)
+      .then(createdBlog => {
+        const blogWithUser = {
+          ...createdBlog,
+          user: createdBlog.user || {
+            username: user.username,
+            name: user.name,
+            id: user.id
+          },
+          likes: createdBlog.likes || 0,
+          likedBy: createdBlog.likedBy || []
+        };
+
+        setBlogs(blogs.concat(blogWithUser));
+
+        setNotification({
+          message: `A new blog "${createdBlog.title}" by ${createdBlog.author} added`,
+          status: 'success'
+        });
+        setTimeout(() => {
+          setNotification({ message: null, status: null });
+        }, 5000);
+      })
+      .catch(error => {
+        console.error('Error creating blog:', error);
+        setNotification({
+          message: 'Failed to create blog',
+          status: 'error'
+        });
+        setTimeout(() => {
+          setNotification({ message: null, status: null });
+        }, 5000);
+      });
+  };
+
   const handleTitleChange = (event) => {
     setTitle(event.target.value)
   }
@@ -112,9 +149,21 @@ const App = () => {
     setBlogs(blogs.map(blog => blog.id !== likedBlog.id ? blog : likedBlog))
   }
 
-  const handleRemove = async (blog) => {
-    await blogService.remove(blog.id)
-    setBlogs(blogs.filter(blog => blog.id !== blog.id))
+  const handleRemove = async (blogToRemove) => {
+    try {
+      await blogService.remove(blogToRemove.id)
+      setBlogs(blogs.filter(blog => blog.id !== blogToRemove.id))
+      setNotification({
+        message: `Blog "${blogToRemove.title}" was successfully removed`,
+        status: 'success'
+      });
+      setTimeout(() => {
+        setNotification({ message: null, status: null });
+      }, 5000);
+    } catch (error) {
+      setNotification({ message: error.response.data.error, status: 'error' })
+      setTimeout(() => setNotification({ message: null, status: null }), 5000)
+    }
   }
 
   const loginForm = () => {
@@ -135,6 +184,7 @@ const App = () => {
   const blogForm = (
     <Togglable buttonLabel="new blog">
       <BlogForm
+        createBlog={createBlog}
         handleSubmit={handleBlogSubmit}
         handleTitleChange={handleTitleChange}
         handleAuthorChange={handleAuthorChange}
