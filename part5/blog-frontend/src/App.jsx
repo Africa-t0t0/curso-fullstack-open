@@ -185,13 +185,6 @@ const App = () => {
     <Togglable buttonLabel="new blog">
       <BlogForm
         createBlog={createBlog}
-        handleSubmit={handleBlogSubmit}
-        handleTitleChange={handleTitleChange}
-        handleAuthorChange={handleAuthorChange}
-        handleUrlChange={handleUrlChange}
-        title={title}
-        author={author}
-        url={url}
       />
     </Togglable>
   )
