@@ -18,38 +18,43 @@ const BlogForm = ({ createBlog }) => {
     }
 
     return (
-        <div>
+        <div
+            className='formDiv'
+        >
             <h2>Create a new blog</h2>
             <form onSubmit={addBlog}>
-            <div>
-                title
-                <input
-                    type="text"
-                    value={title}
-                    name="Title"
-                    onChange={event => setTitle(event.target.value)}
-                />
-            </div>
-            <div>
-                author
-                <input
-                    type="text"
-                    value={author}
-                    name="Author"
-                    onChange={event => setAuthor(event.target.value)}
-                />
-            </div>
-            <div>
-                url
-                <input
-                    type="text"
-                    value={url}
-                    name="Url"
-                    onChange={event => setUrl(event.target.value)}
-                />
-            </div>
-            <button type="submit">create</button>
-        </form>
+                <div>
+                    <label htmlFor="title">Title</label>
+                    <input
+                        id="title"
+                        name="Title"
+                        type="text"
+                        value={title}
+                        onChange={({ target }) => setTitle(target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="author">Author</label>
+                    <input
+                        id="author"
+                        name="Author"
+                        type="text"
+                        value={author}
+                        onChange={({ target }) => setAuthor(target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="url">Url</label>
+                    <input
+                        id="url"
+                        name="Url"
+                        type="text"
+                        value={url}
+                        onChange={({ target }) => setUrl(target.value)}
+                    />
+                </div>
+                <button type="submit">create</button>
+            </form>
         </div>
     )
 }
