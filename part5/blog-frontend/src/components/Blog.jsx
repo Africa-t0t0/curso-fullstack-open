@@ -14,12 +14,15 @@ const Blog = ({ blog, handleLike, handleRemove }) => {
       <ul>
         <li>{blog.title} by {blog.author}</li>
         <li>{blog.url}</li>
-        <li>{blog.likes} <button onClick={() => handleLike(blog)}>like</button></li>
+        <li>{blog.likes || 0} likes <button onClick={() => handleLike(blog)}>like</button></li>
         <li>{blog.likedBy ? blog.likedBy.map(user => user.username).join(', ') : 'No likes'}</li>
       </ul>
       <div>
         {blog.user && blog.user.username === currentUser?.username && (
-          <button onClick={() => handleRemove(blog)}>remove</button>
+          <button
+            onClick={() => handleRemove(blog)}
+            name="remove"
+          >remove</button>
         )}
       </div>
     </div>
