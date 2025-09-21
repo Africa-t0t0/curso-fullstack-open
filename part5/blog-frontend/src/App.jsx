@@ -13,7 +13,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [blogs, setBlogs] = useState([])
-  console.log('user!!!', user)
   const [notification, setNotification] = useState({ message: null, status: null })
 
   useEffect(() => {
@@ -150,7 +149,7 @@ const App = () => {
   }
 
   const blogForm = (
-    <Togglable buttonLabel="new blog">
+    <Togglable buttonLabel="new blog" initialVisible={false}>
       <BlogForm
         createBlog={createBlog}
       />
@@ -176,6 +175,9 @@ const App = () => {
           </Togglable>
         </div>
       )}
+      <div>
+        Full stack course 2025
+      </div>
     </div>
 
   )
