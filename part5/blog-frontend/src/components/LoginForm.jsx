@@ -7,28 +7,35 @@ const LoginForm = ({
     username,
     password
 }) => {
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
+        handleSubmit({ username, password });
+      };
 
     return (
         <div>
             <h2>Login</h2>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleFormSubmit}>
                 <div>
-                    username
+                    <label htmlFor="username">username</label>
                     <input
+                        id="username"
+                        type="text"
                         value={username}
                         onChange={handleUsernameChange}
                     />
                 </div>
                 <div>
-                    password
+                    <label htmlFor="password">password</label>
                     <input
+                        id="password"
                         type="password"
                         value={password}
                         onChange={handlePasswordChange}
                     />
                 </div>
-                <button type="submit">login</button>
+                <button id="login-button" type="submit">login!</button>
             </form>
         </div>
     )

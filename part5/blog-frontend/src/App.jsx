@@ -73,17 +73,14 @@ const App = () => {
       });
   };
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
+  const handleLogin = async (credentials) => {
     try {
       const user = await loginService.login({
         username, password,
       })
-      console.log('userXX', user)
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
-      console.log('user', user)
       setUsername('')
       setPassword('')
       setNotification({ message: 'welcome back ' + user.username, status: 'success' })
@@ -105,8 +102,9 @@ const App = () => {
 
   const handleLike = async (blog) => {
     const hasLiked = blog.likedBy && blog.likedBy.some(
-      like => like.user && like.user.id === user.id
+      like => like.username === user.username
     );
+    console.log('hasLiked', blog.likedBy)
 
     if (hasLiked) {
       setNotification({ message: 'You have already liked this blog', status: 'error' })
