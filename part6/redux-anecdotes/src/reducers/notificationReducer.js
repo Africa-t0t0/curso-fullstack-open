@@ -21,12 +21,12 @@ export const { setNotification, clearNotification } = notificationSlice.actions
 export const showNotification = (message, seconds = 5) => {
   return async dispatch => {
     dispatch(setNotification(message))
-    
+
     // Limpiar cualquier temporizador existente
     if (window.notificationTimeout) {
       clearTimeout(window.notificationTimeout)
     }
-    
+
     // Establecer un nuevo temporizador para limpiar la notificación
     window.notificationTimeout = setTimeout(() => {
       dispatch(clearNotification())
