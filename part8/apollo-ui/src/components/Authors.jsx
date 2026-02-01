@@ -39,17 +39,21 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
-      <SetBirthYear authors={authors} />
+      <SetBirthYear authors={authors} setError={props.setError} />
     </div>
   )
 }
 
-const SetBirthYear = ({ authors }) => {
+const SetBirthYear = (props) => {
   const [selectedOption, setSelectedOption] = useState(null)
   const [born, setBorn] = useState('')
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    refetchQueries: [{ query: ALL_AUTHORS }],
+    onError: (error) => {
+      const messages = error.graphQLErrors.map(e => e.message).join('\n')
+      props.setError(messages)
+    }
   })
 
   const submit = async (event) => {
@@ -66,7 +70,7 @@ const SetBirthYear = ({ authors }) => {
     setBorn('')
   }
 
-  const options = authors.map(a => ({
+  const options = props.authors.map(a => ({
     value: a.name,
     label: a.name
   }))
