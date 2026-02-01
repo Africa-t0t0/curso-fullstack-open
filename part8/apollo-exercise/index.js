@@ -10,8 +10,9 @@ require('dotenv').config()
 
 mongoose.set('strictQuery', false)
 
-const mongodbUri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@mongodb.fp1zlj8.mongodb.net/?appName=MongoDB`
+const mongodbUri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@mongodb.fp1zlj8.mongodb.net/library?appName=MongoDB`
 const MONGODB_URI = mongodbUri;
+process.env.JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET || 'secret' // Fallback for debugging
 
 console.log('connecting to', MONGODB_URI)
 
@@ -182,6 +183,10 @@ const resolvers = {
         },
         login: async (root, args) => {
             const user = await User.findOne({ username: args.username })
+
+            console.log('Login attempt:', args.username)
+            console.log('Found user:', user)
+            console.log('Password check:', args.password, 'secret', args.password === 'secret')
 
             if (!user || args.password !== 'secret') {
                 throw new GraphQLError('wrong credentials', {
