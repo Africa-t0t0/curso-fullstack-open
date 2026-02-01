@@ -14,7 +14,7 @@ const Books = (props) => {
   }
 
   if (result.error) {
-    return <div>error</div>
+    return <div>error: {result.error.message}</div>
   }
 
   const books = result.data.allBooks
@@ -33,7 +33,7 @@ const Books = (props) => {
           {books.map((a) => (
             <tr key={a.id}>
               <td>{a.title}</td>
-              <td>{a.author}</td>
+              <td>{a.author.name}</td>
               <td>{a.published}</td>
             </tr>
           ))}

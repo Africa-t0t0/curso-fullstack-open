@@ -10,7 +10,8 @@ require('dotenv').config()
 
 mongoose.set('strictQuery', false)
 
-const MONGODB_URI = process.env.MONGODB_URI
+const mongodbUri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@mongodb.fp1zlj8.mongodb.net/?appName=MongoDB`
+const MONGODB_URI = mongodbUri;
 
 console.log('connecting to', MONGODB_URI)
 
